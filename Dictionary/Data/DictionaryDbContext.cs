@@ -15,5 +15,6 @@ namespace Dictionary.Data
         }
 
         public DbSet<Definition> Definitions { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }

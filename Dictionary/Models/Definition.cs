@@ -8,5 +8,7 @@ namespace Dictionary.Models
         public string EnglishWord { get; set; }
         public string PartOfSpeech { get; set; }
         public string MalayalamDefinition { get; set; }
+        public int UserId { get; set; }
+        public User User { get; set; }
     }
 }
