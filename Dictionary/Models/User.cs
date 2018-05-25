@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Dictionary.Models
@@ -13,5 +14,6 @@ namespace Dictionary.Models
         public string Password { get; set; }
         public bool IsActive { get; set; } = false;
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
+        public virtual IEnumerable<Definition> Definitions { get; set; }
     }
 }
