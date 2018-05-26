@@ -4,6 +4,7 @@ using Dictionary.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System;
+using System.Threading.Tasks;
 
 namespace Dictionary.Services
 {
@@ -14,10 +15,10 @@ namespace Dictionary.Services
         {
             _dictionaryDbContext = dictionaryDbContext;
         }
-        public IEnumerable<Definition> FindMeaning(string text)
+        public async Task<IEnumerable<Definition>> FindMeaning(string text)
         {
-            return _dictionaryDbContext.Definitions
-                .Where(x => x.EnglishWord.Equals(text, StringComparison.OrdinalIgnoreCase));
+            return await _dictionaryDbContext.Definitions.
+                Where(x => x.EnglishWord.Equals(text, StringComparison.OrdinalIgnoreCase)).ToArrayAsync();
         }
     }
 }

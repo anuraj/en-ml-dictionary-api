@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Dictionary.Data;
 using Dictionary.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -10,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Dictionary
 {
@@ -29,7 +32,6 @@ namespace Dictionary
                 builder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
 
-            // services.AddSingleton(typeof(IDictionaryService), typeof(CSVDictionaryService));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped(typeof(IDictionaryService), typeof(DBDictionaryService));
             services.AddScoped(typeof(ICurrentUserAccessor), typeof(CurrentUserAccessor));
@@ -50,6 +52,10 @@ namespace Dictionary
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "Dictionary API", Version = "v1", Description = "ASP.NET Core Web API for English to Malayalam Dictionary" });
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -66,6 +72,13 @@ namespace Dictionary
             app.UseResponseTime();
             app.UseAuthentication();
             app.UseHttpsRedirection();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dictionary API V1");
+                c.RoutePrefix = string.Empty;
+            });
+
             app.UseMvc();
         }
     }

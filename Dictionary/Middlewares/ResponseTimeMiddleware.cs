@@ -13,7 +13,6 @@ namespace Dictionary.Middlewares
         {
             _next = next;
         }
-
         public async Task InvokeAsync(HttpContext context)
         {
             var watch = new Stopwatch();
@@ -23,7 +22,8 @@ namespace Dictionary.Middlewares
             {
                 watch.Stop();
                 var httpContext = (HttpContext)state;
-                httpContext.Response.Headers.Add("X-Response-Time-Milliseconds", new[] { watch.ElapsedMilliseconds.ToString() });
+                httpContext.Response.Headers.Add("X-Response-Time-Milliseconds", 
+                    new[] { watch.ElapsedMilliseconds.ToString() });
                 return Task.FromResult(0);
             }, context);
 

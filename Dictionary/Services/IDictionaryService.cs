@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Dictionary.Models;
 
 namespace Dictionary.Services
 {
     public interface IDictionaryService
     {
-        IEnumerable<Definition> FindMeaning(string text);
+        Task<IEnumerable<Definition>> FindMeaning(string text);
     }
 }

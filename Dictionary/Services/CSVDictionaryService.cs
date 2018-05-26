@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Dictionary.Models;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Dictionary.Services
 {
@@ -37,7 +38,7 @@ namespace Dictionary.Services
                 }
             }
         }
-        public IEnumerable<Definition> FindMeaning(string text)
+        public async Task<IEnumerable<Definition>> FindMeaning(string text)
         {
             var results = _definitions.Where
                 (x => x.EnglishWord.Equals(text, StringComparison.OrdinalIgnoreCase));

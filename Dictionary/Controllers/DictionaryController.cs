@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dictionary.Data;
@@ -25,30 +24,85 @@ namespace Dictionary.Controllers
             _currentUserAccessor = currentUserAccessor;
         }
 
-        [HttpGet("Find")]
-        public ActionResult<IEnumerable<Definition>> Find([FromQuery, BindRequired]string text)
+        [HttpGet("{text}")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(IEnumerable<Definition>), 200)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult<IEnumerable<Definition>>> Find([FromRoute, BindRequired]string text)
         {
-            var result = _dictionaryService.FindMeaning(text);
+            var result = await _dictionaryService.FindMeaning(text);
             if (result != null && result.Any())
             {
                 return Ok(result);
             }
 
-            return NoContent();
+            return NotFound();
         }
 
-        [HttpPost, Authorize]
+        [HttpPost]
+        [Authorize]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(Definition), 200)]
+        [ProducesResponseType(400)]
         public ActionResult<Definition> Post([FromBody]Definition definition)
         {
             definition.User = _currentUserAccessor.GetCurrentUser;
             definition.Id = _dictionaryDbContext.Definitions.Max(x => x.Id) + 1;
             _dictionaryDbContext.Definitions.Add(definition);
             var inserted = _dictionaryDbContext.SaveChanges() == 1;
-            if(inserted)
+            if (inserted)
+            {
+                return Ok(definition);
+            }
+
+            return BadRequest();
+        }
+
+        [HttpPut]
+        [Authorize]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(Definition), 200)]
+        [ProducesResponseType(400)]
+        public ActionResult<Definition> Update([FromBody]Definition definition)
+        {
+            definition.User = _currentUserAccessor.GetCurrentUser;
+            _dictionaryDbContext.Update(definition);
+            var updated = _dictionaryDbContext.SaveChanges() == 1;
+            if (updated)
+            {
+                return Ok(definition);
+            }
+
+            return BadRequest();
+        }
+
+        [HttpDelete]
+        [Authorize]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(200)]
+        public ActionResult Delete(int id)
+        {
+            var definition = _dictionaryDbContext.Definitions
+                .FirstOrDefault(x => x.Id == id);
+            if (definition == null)
+            {
+                return NotFound();
+            }
+
+            if (definition.User != _currentUserAccessor.GetCurrentUser)
+            {
+                return Unauthorized();
+            }
+
+            _dictionaryDbContext.Definitions.Remove(definition);
+            var deleted = _dictionaryDbContext.SaveChanges() == 1;
+            if (deleted)
             {
                 return Ok();
             }
-            
+
             return BadRequest();
         }
     }
